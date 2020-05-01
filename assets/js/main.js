@@ -1,50 +1,40 @@
 /**
-* Template Name: Anyar - v2.0.0
-* Template URL: https://bootstrapmade.com/anyar-free-multipurpose-one-page-bootstrap-theme/
+* Template Name: Personal - v2.1.0
+* Template URL: https://bootstrapmade.com/personal-free-resume-bootstrap-template/
 * Author: BootstrapMade.com
 * License: https://bootstrapmade.com/license/
 */
 !(function($) {
   "use strict";
 
-  // Preloader
-  $(window).on('load', function() {
-    if ($('#preloader').length) {
-      $('#preloader').delay(100).fadeOut('slow', function() {
-        $(this).remove();
-      });
-    }
-  });
-
-  // Smooth scroll for the navigation menu and links with .scrollto classes
-  $(document).on('click', '.nav-menu a, .mobile-nav a, .scrollto', function(e) {
+  // Nav Menu
+  $(document).on('click', '.nav-menu a, .mobile-nav a', function(e) {
     if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') && location.hostname == this.hostname) {
-      var target = $(this.hash);
+      var hash = this.hash;
+      var target = $(hash);
       if (target.length) {
         e.preventDefault();
-
-        var scrollto = target.offset().top;
-        var scrolled = 20;
-
-        if ($('#header').length) {
-          scrollto -= $('#header').outerHeight()
-
-          if (!$('#header').hasClass('header-scrolled')) {
-            scrollto += scrolled;
-          }
-        }
-
-        if ($(this).attr("href") == '#header' || $(this).attr("href") == 'index.html#header') {
-          scrollto = 0;
-        }
-
-        $('html, body').animate({
-          scrollTop: scrollto
-        }, 1500, 'easeInOutExpo');
 
         if ($(this).parents('.nav-menu, .mobile-nav').length) {
           $('.nav-menu .active, .mobile-nav .active').removeClass('active');
           $(this).closest('li').addClass('active');
+        }
+
+        if (hash == '#header') {
+          $('#header').removeClass('header-top');
+          $("section").removeClass('section-show');
+          return;
+        }
+
+        if (!$('#header').hasClass('header-top')) {
+          $('#header').addClass('header-top');
+          setTimeout(function() {
+            $("section").removeClass('section-show');
+            $(hash).addClass('section-show');
+          }, 350);
+        } else {
+          $("section").removeClass('section-show');
+          $(hash).addClass('section-show');
         }
 
         if ($('body').hasClass('mobile-nav-active')) {
@@ -52,10 +42,26 @@
           $('.mobile-nav-toggle i').toggleClass('icofont-navigation-menu icofont-close');
           $('.mobile-nav-overly').fadeOut();
         }
+
         return false;
+
       }
     }
   });
+
+  // Activate/show sections on load with hash links
+  if (window.location.hash) {
+    var initial_nav = window.location.hash;
+    if ($(initial_nav).length) {
+      $('#header').addClass('header-top');
+      $('.nav-menu .active, .mobile-nav .active').removeClass('active');
+      $('.nav-menu, .mobile-nav').find('a[href="' + initial_nav + '"]').parent('li').addClass('active');
+      setTimeout(function() {
+        $("section").removeClass('section-show');
+        $(initial_nav).addClass('section-show');
+      }, 350);
+    }
+  }
 
   // Mobile Navigation
   if ($('.nav-menu').length) {
@@ -72,12 +78,6 @@
       $('.mobile-nav-overly').toggle();
     });
 
-    $(document).on('click', '.mobile-nav .drop-down > a', function(e) {
-      e.preventDefault();
-      $(this).next().slideToggle(300);
-      $(this).parent().toggleClass('active');
-    });
-
     $(document).click(function(e) {
       var container = $(".mobile-nav, .mobile-nav-toggle");
       if (!container.is(e.target) && container.has(e.target).length === 0) {
@@ -92,91 +92,35 @@
     $(".mobile-nav, .mobile-nav-toggle").hide();
   }
 
-  // Navigation active state on scroll
-  var nav_sections = $('section');
-  var main_nav = $('.nav-menu, #mobile-nav');
+  // jQuery counterUp
+  $('[data-toggle="counter-up"]').counterUp({
+    delay: 10,
+    time: 1000
+  });
 
-  $(window).on('scroll', function() {
-    var cur_pos = $(this).scrollTop() + 90;
-
-    nav_sections.each(function() {
-      var top = $(this).offset().top,
-        bottom = top + $(this).outerHeight();
-
-      if (cur_pos >= top && cur_pos <= bottom) {
-        if (cur_pos <= bottom) {
-          main_nav.find('li').removeClass('active');
-        }
-        main_nav.find('a[href="index.html#' + $(this).attr('id') + '"]').parent('li').addClass('active');
-      }
-      if (cur_pos < 300) {
-        $(".nav-menu ul:first li:first").addClass('active');
-      }
+  // Skills section
+  $('.skills-content').waypoint(function() {
+    $('.progress .progress-bar').each(function() {
+      $(this).css("width", $(this).attr("aria-valuenow") + '%');
     });
+  }, {
+    offset: '80%'
   });
 
-  // Toggle .header-scrolled class to #header when page is scrolled
-  $(window).scroll(function() {
-    if ($(this).scrollTop() > 100) {
-      $('#header').addClass('header-scrolled');
-      $('#topbar').addClass('topbar-scrolled');
-    } else {
-      $('#header').removeClass('header-scrolled');
-      $('#topbar').removeClass('topbar-scrolled');
-    }
-  });
-
-  if ($(window).scrollTop() > 100) {
-    $('#header').addClass('header-scrolled');
-    $('#topbar').addClass('topbar-scrolled');
-  }
-
-  // Real view height for mobile devices
-  if (window.matchMedia("(max-width: 767px)").matches) {
-    $('#hero').css({
-      height: $(window).height()
-    });
-  }
-
-  // Back to top button
-  $(window).scroll(function() {
-    if ($(this).scrollTop() > 100) {
-      $('.back-to-top').fadeIn('slow');
-    } else {
-      $('.back-to-top').fadeOut('slow');
-    }
-  });
-
-  $('.back-to-top').click(function() {
-    $('html, body').animate({
-      scrollTop: 0
-    }, 1500, 'easeInOutExpo');
-    return false;
-  });
-
-  // Intro carousel
-  var heroCarousel = $("#heroCarousel");
-
-  heroCarousel.on('slid.bs.carousel', function(e) {
-    $(this).find('h2').addClass('animated fadeInDown');
-    $(this).find('p').addClass('animated fadeInUp');
-    $(this).find('.btn-get-started').addClass('animated fadeInUp');
-  });
-
-  // Clients carousel (uses the Owl Carousel library)
-  $(".clients-carousel").owlCarousel({
+  // Testimonials carousel (uses the Owl Carousel library)
+  $(".testimonials-carousel").owlCarousel({
     autoplay: true,
     dots: true,
     loop: true,
     responsive: {
       0: {
-        items: 2
+        items: 1
       },
       768: {
-        items: 4
+        items: 2
       },
       900: {
-        items: 6
+        items: 3
       }
     }
   });
@@ -195,49 +139,13 @@
       portfolioIsotope.isotope({
         filter: $(this).data('filter')
       });
-      aos_init();
     });
-
-    // Initiate venobox (lightbox feature used in portofilo)
-    $(document).ready(function() {
-      $('.venobox').venobox();
-    });
-  });
-
-  // Scroll to a section with hash in url
-  $(window).on('load', function() {
-
-    if (window.location.hash) {
-      var initial_nav = window.location.hash;
-      if ($(initial_nav).length) {
-        var target_hash = $(initial_nav);
-        var scrollto_hash = target_hash.offset().top - $('#header').outerHeight();
-        $('html, body').animate({
-          scrollTop: scrollto_hash
-        }, 1500, 'easeInOutExpo');
-        $('.nav-menu .active, .mobile-nav .active').removeClass('active');
-        $('.nav-menu, .mobile-nav').find('a[href="' + initial_nav + '"]').parent('li').addClass('active');
-      }
-    }
 
   });
 
-  // Portfolio details carousel
-  $(".portfolio-details-carousel").owlCarousel({
-    autoplay: true,
-    dots: true,
-    loop: true,
-    items: 1
+  // Initiate venobox (lightbox feature used in portofilo)
+  $(document).ready(function() {
+    $('.venobox').venobox();
   });
-
-  // Initi AOS
-  function aos_init() {
-    AOS.init({
-      duration: 1000,
-      easing: "ease-in-out-back",
-      once: true
-    });
-  }
-  aos_init();
 
 })(jQuery);
